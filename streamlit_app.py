@@ -3,14 +3,24 @@ import pandas as pd
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
+import os
 
-# 나눔고딕 폰트 경로 설정 (Windows 환경)
-font_path = r"C:\Users\SKTelecom\Downloads\NanumGothic.ttf"
-if not fm.findfont(fm.FontProperties(fname=font_path)):
-    st.error(f"❌ '{font_path}' 경로에 폰트가 없습니다. 경로를 확인하세요.")
-    st.stop()
+# 폰트 경로 설정 (Windows와 Linux 환경 처리)
+def get_font_path():
+    # 폰트 경로 설정 (Windows와 Linux 환경 처리)
+    if os.name == 'nt':  # Windows
+        font_path = r"C:\Users\SKTelecom\Downloads\NanumGothic.ttf"
+    else:  # Linux 또는 다른 OS
+        font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"
+
+    if not os.path.exists(font_path):
+        st.error(f"❌ '{font_path}' 경로에 폰트가 없습니다. 경로를 확인하세요.")
+        st.stop()
+    
+    return font_path
 
 # 한글 폰트 설정
+font_path = get_font_path()
 font_prop = fm.FontProperties(fname=font_path)
 plt.rc('font', family=font_prop.get_name())
 
@@ -61,30 +71,4 @@ if uploaded_file is not None:
 
         # 일주일 전 데이터 필터링
         one_week_ago = datetime.now() - timedelta(days=7)
-        week_ago_data = filtered_data[pd.to_datetime(filtered_data['날짜']) >= one_week_ago]
-
-        # 일주일 최고/최저 온도 계산
-        max_temp = week_ago_data['온도'].max()
-        min_temp = week_ago_data['온도'].min()
-
-        # 일주일 최고 온도 추이 계산
-        max_temp_trend = week_ago_data.groupby('dt')['온도'].max()
-
-        # 결과 출력
-        st.write(f"📍 가장 유사한 통합국명: {most_similar_location}")
-        st.write(f"🔢 모듈번호: {module_number}")
-        st.write(f"🌡️ 가장 최근 온도: {latest_temp}°C (측정일: {latest_date})")
-        st.write(f"🔺 일주일 최고 온도: {max_temp}°C")
-        st.write(f"🔻 일주일 최저 온도: {min_temp}°C")
-
-        # 일주일 최고 온도 추이 그래프 시각화
-        fig, ax = plt.subplots(figsize=(10, 5))
-        ax.plot(max_temp_trend.index.astype(str), max_temp_trend.values, marker='o', linestyle='-', linewidth=2)
-        ax.set_title(f"'{most_similar_location}' 지역의 일주일 최고 온도 추이", fontsize=15)
-        ax.set_xlabel('날짜', fontsize=12)
-        ax.set_ylabel('최고 온도 (°C)', fontsize=12)
-        plt.xticks(rotation=45)
-        plt.grid(True)
-
-        # 그래프 출력
-        st.pyplot(fig)
+        week_ago_data = filtered_data[pd
