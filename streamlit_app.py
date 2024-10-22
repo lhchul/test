@@ -3,13 +3,10 @@ import pandas as pd
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
-import os
 
-# 폰트 경로 설정 (Windows에서 경로 문자열 처리)
-font_path = os.path.join("C:", "Users", "SKTelecom", "Downloads", "NanumGothic.ttf")
-
-# 폰트가 존재하는지 확인
-if not os.path.exists(font_path):
+# 나눔고딕 폰트 경로 설정 (Windows 환경)
+font_path = r"C:\Users\SKTelecom\Downloads\NanumGothic.ttf"
+if not fm.findfont(fm.FontProperties(fname=font_path)):
     st.error(f"❌ '{font_path}' 경로에 폰트가 없습니다. 경로를 확인하세요.")
     st.stop()
 
