@@ -54,7 +54,7 @@ if uploaded_file is not None:
     # 2주일 데이터 필터링 및 평균 온도 계산
     two_weeks_ago = datetime.now() - timedelta(days=14)
     two_weeks_data = data[data['날짜'] >= two_weeks_ago]
-    two_weeks_avg = two_weeks_data.groupby(two_weeks_data['날짜'].dt.strftime('%a'))['온도'].mean()
+    two_weeks_avg = two_weeks_data.groupby(two_weeks_data['날짜'].dt.strftime('%m-%d'))['온도'].mean()
 
     # 결과 출력
     st.write(f"📈 각 모듈번호의 평균 온도:")
@@ -76,12 +76,13 @@ if uploaded_file is not None:
 
     st.pyplot(fig1)
 
-    # 2주일 평균 온도 그래프 (요일별)
+    # 2주일 평균 온도 그래프 (월-일 형식)
     fig2, ax2 = plt.subplots(figsize=(10, 5))
     ax2.plot(two_weeks_avg.index, two_weeks_avg.values, marker='o', linestyle='-', linewidth=2)
-    ax2.set_title('2주일 요일별 평균 온도', fontsize=15)
-    ax2.set_xlabel('요일', fontsize=12)
+    ax2.set_title('2주일 월-일별 평균 온도', fontsize=15)
+    ax2.set_xlabel('날짜 (월-일)', fontsize=12)
     ax2.set_ylabel('평균 온도 (°C)', fontsize=12)
+    plt.xticks(rotation=45)  # 월-일 보기 좋게 회전
     plt.grid(True)
 
     st.pyplot(fig2)
