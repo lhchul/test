@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import os
+import requests  # 서버에 데이터 전송을 위한 라이브러리
 
 from sklearn.metrics.pairwise import cosine_similarity
 from sklearn.feature_extraction.text import CountVectorizer
@@ -40,6 +41,19 @@ def find_similar_locations(input_name, locations):
     similar_indices = cosine_sim.argsort()[-10:][::-1]
     return [locations[i] for i in similar_indices]
 
+# 서버에 선택한 통합국명을 전송하는 함수
+def send_to_server(selected_location):
+    url = "http://your-server-endpoint"  # 서버 엔드포인트 URL
+    payload = {"selected_location": selected_location}
+    try:
+        response = requests.post(url, json=payload)
+        if response.status_code == 200:
+            st.success(f"'{selected_location}' 통합국명이 서버로 성공적으로 전송되었습니다.")
+        else:
+            st.error("서버에 데이터를 전송하는 중 오류가 발생했습니다.")
+    except Exception as e:
+        st.error(f"서버 전송 중 오류 발생: {str(e)}")
+
 # 그래프를 이미지로 저장하고 경로 반환
 def save_plot(fig, filename):
     ensure_dir("images")
@@ -72,6 +86,10 @@ if uploaded_file is not None:
         # 유사한 통합국명을 선택할 수 있는 폴더 형식으로 제공
         selected_location = st.selectbox("매칭된 통합국명을 선택하세요:", similar_locations)
 
+        # 선택한 통합국명을 서버로 전송
+        if st.button("서버로 전송"):
+            send_to_server(selected_location)
+
         # 선택한 통합국명의 데이터 필터링
         filtered_data = data[data['통합국명'].str.lower() == selected_location]
 
@@ -88,7 +106,7 @@ if uploaded_file is not None:
         max_temp = week_data['온도'].max()
         min_temp = week_data['온도'].min()
 
-        # 일평균 온도 계산 (결측값 제외)
+        # 일평균 온도 계산
         today_data = filtered_data[filtered_data['날짜'].dt.date == datetime.now().date()]
         daily_avg_temp = today_data['온도'].mean()
 
