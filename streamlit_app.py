@@ -4,10 +4,6 @@ from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import os
-import requests  # 서버에 데이터 전송을 위한 라이브러리
-
-from sklearn.metrics.pairwise import cosine_similarity
-from sklearn.feature_extraction.text import CountVectorizer
 
 # 폴더 생성 함수 (이미지 저장용)
 def ensure_dir(directory):
@@ -28,31 +24,6 @@ font_path = find_available_font()
 if font_path:
     font_prop = fm.FontProperties(fname=font_path)
     plt.rc('font', family=font_prop.get_name())
-
-# 통합국명 유사도 찾기 함수
-def find_similar_locations(input_name, locations):
-    input_name = input_name.lower()
-    locations = [loc.lower() for loc in locations]
-    vectorizer = CountVectorizer().fit_transform([input_name] + locations)
-    vectors = vectorizer.toarray()
-    cosine_sim = cosine_similarity(vectors[0:1], vectors[1:]).flatten()
-
-    # 유사도가 높은 상위 10개 통합국명 선택
-    similar_indices = cosine_sim.argsort()[-10:][::-1]
-    return [locations[i] for i in similar_indices]
-
-# 서버에 선택한 통합국명을 전송하는 함수
-def send_to_server(selected_location):
-    url = "http://your-server-endpoint"  # 서버 엔드포인트 URL
-    payload = {"selected_location": selected_location}
-    try:
-        response = requests.post(url, json=payload)
-        if response.status_code == 200:
-            st.success(f"'{selected_location}' 통합국명이 서버로 성공적으로 전송되었습니다.")
-        else:
-            st.error("서버에 데이터를 전송하는 중 오류가 발생했습니다.")
-    except Exception as e:
-        st.error(f"서버 전송 중 오류 발생: {str(e)}")
 
 # 그래프를 이미지로 저장하고 경로 반환
 def save_plot(fig, filename):
@@ -75,26 +46,17 @@ if uploaded_file is not None:
     # 결측값을 제외하고 데이터 필터링
     data = data.dropna(subset=['온도'])  # 온도 값이 없는 행 제외
 
-    # 통합국명 입력받기
-    user_input = st.text_input("통합국명을 입력하세요:")
+    # 통합국명 목록을 가, 나, 다, 라 순으로 정렬
+    unique_locations = sorted(data['통합국명'].unique())
 
-    if user_input:
-        # 유사한 통합국명 찾기
-        unique_locations = data['통합국명'].unique()
-        similar_locations = find_similar_locations(user_input, unique_locations)
+    # 가, 나, 다, 라 순서로 폴더 형식으로 선택
+    selected_location = st.selectbox("통합국명을 선택하세요:", unique_locations)
 
-        # 유사한 통합국명을 선택할 수 있는 폴더 형식으로 제공
-        selected_location = st.selectbox("매칭된 통합국명을 선택하세요:", similar_locations)
-
-        # 선택한 통합국명을 서버로 전송
-        if st.button("서버로 전송"):
-            send_to_server(selected_location)
-
+    if selected_location:
         # 선택한 통합국명의 데이터 필터링
-        filtered_data = data[data['통합국명'].str.lower() == selected_location]
+        filtered_data = data[data['통합국명'] == selected_location]
 
         # 통합국명 결과 출력
-        st.write(f"**입력한 통합국명**: {user_input}")
         st.write(f"**선택된 통합국명**: {selected_location}")
 
         # 각 모듈별 현재 온도 추출
