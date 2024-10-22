@@ -58,6 +58,9 @@ if uploaded_file is not None:
     data = pd.read_csv(uploaded_file)
     data['날짜'] = pd.to_datetime(data['날짜'])
 
+    # 결측값을 제외하고 데이터 필터링
+    data = data.dropna(subset=['온도'])  # 온도 값이 없는 행 제외
+
     # 통합국명 입력받기
     user_input = st.text_input("통합국명을 입력하세요:")
 
@@ -66,7 +69,7 @@ if uploaded_file is not None:
         unique_locations = data['통합국명'].unique()
         similar_locations = find_similar_locations(user_input, unique_locations)
 
-        # 유사한 통합국명을 선택할 수 있는 폴드 제공
+        # 유사한 통합국명을 선택할 수 있는 폴더 형식으로 제공
         selected_location = st.selectbox("매칭된 통합국명을 선택하세요:", similar_locations)
 
         # 선택한 통합국명의 데이터 필터링
@@ -85,7 +88,7 @@ if uploaded_file is not None:
         max_temp = week_data['온도'].max()
         min_temp = week_data['온도'].min()
 
-        # 일평균 온도 계산
+        # 일평균 온도 계산 (결측값 제외)
         today_data = filtered_data[filtered_data['날짜'].dt.date == datetime.now().date()]
         daily_avg_temp = today_data['온도'].mean()
 
