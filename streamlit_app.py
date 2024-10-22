@@ -3,24 +3,25 @@ import pandas as pd
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
-import os
 
-# 폰트 경로 설정 (Windows 환경)
-def get_font_path():
-    font_path = r"C:\Users\SKTelecom\AppData\Local\Microsoft\Windows\Fonts\3.NanumGothic.ttf"  # Windows 경로 설정
+# 시스템 폰트 중에서 'NanumGothic' 폰트를 자동으로 찾기
+def find_available_font():
+    font_list = fm.findSystemFonts(fontpaths=None, fontext='ttf')
+    for font in font_list:
+        if "NanumGothic" in font:
+            return font
 
-    if not os.path.exists(font_path):
-        st.error(f"❌ '{font_path}' 경로에 폰트가 없습니다. 경로를 확인하세요.")
-        st.stop()
+    # 폰트가 없을 경우 기본 설정
+    st.warning("⚠️ 'NanumGothic' 폰트를 찾을 수 없습니다. 기본 폰트를 사용합니다.")
+    return None
 
-    return font_path
+# 폰트 설정
+font_path = find_available_font()
+if font_path:
+    font_prop = fm.FontProperties(fname=font_path)
+    plt.rc('font', family=font_prop.get_name())
 
-# 한글 폰트 설정
-font_path = get_font_path()
-font_prop = fm.FontProperties(fname=font_path)
-plt.rc('font', family=font_prop.get_name())
-
-# scikit-learn 오류 처리
+# scikit-learn 라이브러리 오류 처리
 try:
     from sklearn.metrics.pairwise import cosine_similarity
     from sklearn.feature_extraction.text import CountVectorizer
