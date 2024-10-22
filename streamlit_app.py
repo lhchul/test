@@ -29,7 +29,7 @@ except ModuleNotFoundError:
     st.error("❌ 'scikit-learn' 라이브러리가 설치되지 않았습니다. 아래 명령어로 설치하세요:\n\n`pip install scikit-learn`")
     st.stop()
 
-# 유사한 통합국명 찾기 함수 (대소문자 구분 없이)
+# 유사한 통합국명 찾기 함수
 def find_similar_location(input_name, locations):
     input_name = input_name.lower()
     locations = [loc.lower() for loc in locations]
