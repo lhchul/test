@@ -3,21 +3,14 @@ import pandas as pd
 from datetime import datetime, timedelta
 import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
-import os
 
-# 시스템에서 나눔고딕 폰트 경로 찾기
-def get_font_path():
-    font_dirs = ["/usr/share/fonts", "/usr/local/share/fonts", "C:/Windows/Fonts"]
-    for font_dir in font_dirs:
-        for root, _, files in os.walk(font_dir):
-            for file in files:
-                if "NanumGothic" in file:
-                    return os.path.join(root, file)
-    st.error("❌ 'NanumGothic' 폰트를 찾을 수 없습니다. 시스템에 폰트를 설치하세요.")
+# 나눔고딕 폰트 경로 설정 (Windows 환경)
+font_path = r"C:\Users\SKTelecom\Downloads\NanumGothic.ttf"
+if not fm.findfont(fm.FontProperties(fname=font_path)):
+    st.error(f"❌ '{font_path}' 경로에 폰트가 없습니다. 경로를 확인하세요.")
     st.stop()
 
 # 한글 폰트 설정
-font_path = get_font_path()
 font_prop = fm.FontProperties(fname=font_path)
 plt.rc('font', family=font_prop.get_name())
 
