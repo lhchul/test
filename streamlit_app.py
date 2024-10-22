@@ -67,6 +67,10 @@ if uploaded_file is not None:
         # 해당 통합국명의 데이터 필터링
         filtered_data = data[data['통합국명'].str.lower() == most_similar_location]
 
+        # 통합국명 결과 출력
+        st.write(f"**입력한 통합국명**: {user_input}")
+        st.write(f"**매칭된 통합국명**: {most_similar_location}")
+
         # 각 모듈별 현재 온도 추출
         latest_data = filtered_data.sort_values(by='날짜', ascending=False).groupby('모듈번호').first().reset_index()
 
@@ -128,11 +132,4 @@ if uploaded_file is not None:
 
         # 하루 중 최대값 그래프
         fig3, ax3 = plt.subplots(figsize=(10, 5))
-        ax3.plot(daily_max.index, daily_max.values, marker='o', linestyle='-', linewidth=2)
-        ax3.set_title('하루 중 최대 온도', fontsize=15)
-        ax3.set_xlabel('날짜 (월-일)', fontsize=12)
-        ax3.set_ylabel('최대 온도 (°C)', fontsize=12)
-        plt.xticks(rotation=45)
-        plt.grid(True)
-        img3_path = save_plot(fig3, "daily_max.png")
-        st.image(img3_path)
+        ax3.plot(daily_max.index, daily_max.values, marker='o', linestyle='-', linew
