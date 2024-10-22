@@ -36,8 +36,8 @@ def find_similar_locations(input_name, locations):
     vectors = vectorizer.toarray()
     cosine_sim = cosine_similarity(vectors[0:1], vectors[1:]).flatten()
 
-    # 유사도가 높은 상위 5개 통합국명 선택
-    similar_indices = cosine_sim.argsort()[-5:][::-1]
+    # 유사도가 높은 상위 10개 통합국명 선택
+    similar_indices = cosine_sim.argsort()[-10:][::-1]
     return [locations[i] for i in similar_indices]
 
 # 그래프를 이미지로 저장하고 경로 반환
