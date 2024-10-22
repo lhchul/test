@@ -5,12 +5,9 @@ import matplotlib.pyplot as plt
 import matplotlib.font_manager as fm
 import os
 
-# 폰트 경로 설정 (Windows와 Linux 환경 처리)
+# 폰트 경로 설정 (Windows 환경)
 def get_font_path():
-    if os.name == 'nt':  # Windows 환경
-        font_path = r"C:\Users\SKTelecom\Downloads\NanumGothic.ttf"
-    else:  # Linux 또는 기타 OS 환경
-        font_path = "/usr/share/fonts/truetype/nanum/NanumGothic.ttf"
+    font_path = r"C:\Windows\Fonts\NanumGothic.ttf"  # Windows 경로 설정
 
     if not os.path.exists(font_path):
         st.error(f"❌ '{font_path}' 경로에 폰트가 없습니다. 경로를 확인하세요.")
