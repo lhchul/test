@@ -29,14 +29,16 @@ if font_path:
     plt.rc('font', family=font_prop.get_name())
 
 # 통합국명 유사도 찾기 함수
-def find_similar_location(input_name, locations):
+def find_similar_locations(input_name, locations):
     input_name = input_name.lower()
     locations = [loc.lower() for loc in locations]
     vectorizer = CountVectorizer().fit_transform([input_name] + locations)
     vectors = vectorizer.toarray()
     cosine_sim = cosine_similarity(vectors[0:1], vectors[1:]).flatten()
-    most_similar_index = cosine_sim.argmax()
-    return locations[most_similar_index]
+
+    # 유사도가 높은 상위 5개 통합국명 선택
+    similar_indices = cosine_sim.argsort()[-5:][::-1]
+    return [locations[i] for i in similar_indices]
 
 # 그래프를 이미지로 저장하고 경로 반환
 def save_plot(fig, filename):
@@ -60,16 +62,19 @@ if uploaded_file is not None:
     user_input = st.text_input("통합국명을 입력하세요:")
 
     if user_input:
-        # 가장 유사한 통합국명 찾기
+        # 유사한 통합국명 찾기
         unique_locations = data['통합국명'].unique()
-        most_similar_location = find_similar_location(user_input, unique_locations)
+        similar_locations = find_similar_locations(user_input, unique_locations)
 
-        # 해당 통합국명의 데이터 필터링
-        filtered_data = data[data['통합국명'].str.lower() == most_similar_location]
+        # 유사한 통합국명을 선택할 수 있는 폴드 제공
+        selected_location = st.selectbox("매칭된 통합국명을 선택하세요:", similar_locations)
+
+        # 선택한 통합국명의 데이터 필터링
+        filtered_data = data[data['통합국명'].str.lower() == selected_location]
 
         # 통합국명 결과 출력
         st.write(f"**입력한 통합국명**: {user_input}")
-        st.write(f"**매칭된 통합국명**: {most_similar_location}")
+        st.write(f"**선택된 통합국명**: {selected_location}")
 
         # 각 모듈별 현재 온도 추출
         latest_data = filtered_data.sort_values(by='날짜', ascending=False).groupby('모듈번호').first().reset_index()
